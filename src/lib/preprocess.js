@@ -2,17 +2,18 @@ import { Bezier } from 'bezier-js'
 import Snap from '@creately/snapsvg'
 import {
   vectorLength,
+  subtractVector,
   intersectLines,
   lineToVector,
   linePointFromT,
   lineTFromPoint,
-  lineNearestPointForPoint,
+  nearestPointOnLineForPoint,
 } from '@/lib/vector.js'
 
 async function preprocess(mainSvg) {
   let elements = wrapAllElements(mainSvg)
   intersectAll(elements)
-  return elements
+  return elements.flatMap((e) => e.split())
 }
 
 function wrapAllElements(mainSvg) {
@@ -26,7 +27,7 @@ function wrapAllElements(mainSvg) {
       const wb = new WrappedBezier(
         ...[...b[i - 1].slice(-2), ...b[i].slice(1, b[i].length)]
       )
-      wb.id = e.id
+      wb.id = `${e.id}_B${i - 1}`
       beziers.push(wb)
     }
     return beziers
@@ -70,15 +71,12 @@ class Wrapper {
     // considered the same
     const dist_threshold = 1
 
-    const new_pos = this.getPointFromT(t)
+    const new_point = this.getPointFromT(t)
 
     const distances = this.intersections.map((i) => {
-      const i_pos = this.getPointFromT(i)
-      const diff_vec = {
-        x: new_pos.x - i_pos.x,
-        y: new_pos.y - i_pos.y,
-      }
-      return vectorLength(diff_vec)
+      const i_point = this.getPointFromT(i)
+      const diff = subtractVector(new_point, i_point)
+      return vectorLength(diff)
     })
 
     if (Math.min(...distances) >= dist_threshold) {
@@ -91,10 +89,7 @@ class Wrapper {
     const dist_epsilon = 1
 
     const nearestPoint = this.getNearestPointForPoint(point)
-    const diff = {
-      x: nearestPoint.x - point.x,
-      y: nearestPoint.y - point.y,
-    }
+    const diff = subtractVector(nearestPoint, point)
 
     if (vectorLength(diff) < dist_epsilon) {
       this.addIntersection(nearestPoint.t)
@@ -139,6 +134,7 @@ class WrappedLine extends Wrapper {
     let lines = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
       let new_line = {
+        id: this.id + '_' + i,
         type: 'line',
         n_segments: 1,
         p1: this.getPointFromT(this.intersections[i]),
@@ -152,7 +148,7 @@ class WrappedLine extends Wrapper {
   }
 
   getNearestPointForPoint(point) {
-    return lineNearestPointForPoint(this.line, point)
+    return nearestPointOnLineForPoint(this.line, point)
   }
 
   getTfromPoint(point) {
@@ -206,6 +202,7 @@ class WrappedBezier extends Wrapper {
       )
 
       points.push({
+        id: this.id + '_' + i,
         type: 'cubic',
         p1: new_bezier.points[0],
         c1: new_bezier.points[1],

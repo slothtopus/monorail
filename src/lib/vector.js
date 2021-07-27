@@ -1,7 +1,73 @@
+export function traverseVector(vec, start_t, move_vec) {
+  /*
+    Moves along vector vec as much as possible according to move_vec starting at start_t.
+    We return the new t position and also how much of move_vec hasn't been 'used up' by the 
+    move.
+  
+    vec = Vector along which we will be moving
+    start_t = Position along vec: 0 = start, 1 = end
+    move_vec = Movement vector
+  
+    returns {
+      t: new t position along vec after move
+      new_move_vec: how much of move_vec remains to be used up
+    }
+    */
+
+  const vec_point = linePointFromT(vectorToLine(vec), start_t)
+  const move_vec_proj = vectorProject(move_vec, vec)
+
+  let new_vec_point = addVector(vec_point, move_vec_proj)
+
+  new_vec_point = nearestPointOnLineForPoint(vectorToLine(vec), new_vec_point)
+  const end_t = new_vec_point.t
+
+  const moved_vec = subtractVector(new_vec_point, vec_point)
+
+  const remaining_move_pct =
+    vectorLength(move_vec_proj) == 0
+      ? 1
+      : 1 - vectorLength(moved_vec) / vectorLength(move_vec_proj)
+
+  const new_move_vec = {
+    x: move_vec.x * remaining_move_pct,
+    y: move_vec.y * remaining_move_pct,
+  }
+
+  return {
+    t: end_t,
+    new_move_vec: new_move_vec,
+    distance: vectorLength(moved_vec),
+  }
+}
+
+export function subtractVector(v1, v2) {
+  // returns v1 - v2
+  return {
+    x: v1.x - v2.x,
+    y: v1.y - v2.y,
+  }
+}
+
+export function addVector(v1, v2) {
+  // returns v1 + v2
+  return {
+    x: v1.x + v2.x,
+    y: v1.y + v2.y,
+  }
+}
+
 export function lineToVector(line) {
   return {
     x: line.p2.x - line.p1.x,
     y: line.p2.y - line.p1.y,
+  }
+}
+
+export function vectorToLine(vec) {
+  return {
+    p1: { x: 0, y: 0 },
+    p2: vec,
   }
 }
 
@@ -49,7 +115,7 @@ export function lineTFromPoint(line, pos) {
   }
 }
 
-export function lineNearestPointForPoint(line, point) {
+export function nearestPointOnLineForPoint(line, point) {
   /*
   Gets the nearest position on the line to point
   */

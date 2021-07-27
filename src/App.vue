@@ -1,12 +1,18 @@
 <template>
-  <MazePreprocessExample />
+  <div class="fullscreen">
+    <div class="nav-box">
+      <router-link to="/preprocess">Maze preprocessing</router-link>
+      <router-link to="/drag">Maze dragging</router-link>
+    </div>
+    <div class="content-box">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script>
-import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
 export default {
   name: 'App',
-  components: { MazePreprocessExample },
 }
 </script>
 
@@ -20,5 +26,38 @@ body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.nav-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  height: 5em;
+}
+
+.content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: calc(100% - 5em);
+}
+
+.nav-box .router-link-exact-active {
+  color: yellow;
+}
+
+.nav-box a {
+  color: white;
+}
+
+.fullscreen {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
 }
 </style>

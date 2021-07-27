@@ -1,5 +1,5 @@
 <template>
-  <div class="fullscreen">
+  <div class="container">
     <div class="maze-box" style="">
       <MazeSvg ref="reference-maze" width="100%" height="100%" />
     </div>
@@ -23,7 +23,7 @@
 
 <script>
 import MazeSvg from '@/components/MazeSvg.vue'
-import { preprocess, WrappedLine, WrappedBezier } from '@/lib/preprocess.js'
+import { preprocess } from '@/lib/preprocess.js'
 
 export default {
   name: 'MazePreprocessExample',
@@ -55,7 +55,7 @@ export default {
     setTimeout(async () => {
       console.log('starting to process')
       let elements = await preprocess(this.$refs['reference-maze'].$el)
-      console.log('processed')
+      console.log('processed', elements.length, 'elements')
       this.preprocessing = false
       this.drawAllElements(elements)
     }, 0)
@@ -67,17 +67,9 @@ export default {
       return col
     },
     drawAllElements(elements) {
-      const svgElem = this.$refs['scratch-maze']
       elements.forEach((e) => {
-        if (e instanceof WrappedBezier) {
-          e.split().forEach((v) => {
-            this.drawPath(v, this.getColour(), svgElem)
-          })
-        } else if (e instanceof WrappedLine) {
-          e.split().forEach((v) => {
-            this.drawLine(v, this.getColour(), svgElem)
-          })
-        }
+        if (e.type == 'line') this.drawLine(e, this.getColour())
+        if (e.type == 'cubic') this.drawPath(e, this.getColour())
       })
     },
     drawPath(d, stroke) {
@@ -114,12 +106,10 @@ export default {
 </script>
 
 <style scoped>
-.fullscreen {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
+.container {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 3rem;
 }
 
 .maze-box {

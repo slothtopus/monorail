@@ -327,3 +327,18 @@ line {
   stroke-linecap: square;
 }
 </style>
+
+<style>
+#movePoint {
+  cursor: pointer;
+}
+
+#movePoint:hover {
+  filter: brightness(2);
+}
+
+#movePoint.selected {
+  filter: brightness(1.4);
+  stroke: yellow;
+}
+</style>
