@@ -3,31 +3,16 @@ import Snap from '@creately/snapsvg'
 import {
   vectorLength,
   intersectLines,
+  lineToVector,
   linePointFromT,
   lineTFromPoint,
   lineNearestPointForPoint,
 } from '@/lib/vector.js'
 
-let colours = [
-  '#a6cee3',
-  '#1f78b4',
-  '#b2df8a',
-  '#33a02c',
-  '#fb9a99',
-  '#e31a1c',
-  '#fdbf6f',
-  '#ff7f00',
-  '#cab2d6',
-  '#6a3d9a',
-  '#ffff99',
-  '#b15928',
-]
-let colour_i = 0
-
-async function preprocess(mainSvg, scratchSvg) {
+async function preprocess(mainSvg) {
   let elements = wrapAllElements(mainSvg)
   intersectAll(elements)
-  drawAllElements(scratchSvg, elements)
+  return elements
 }
 
 function wrapAllElements(mainSvg) {
@@ -69,56 +54,6 @@ function intersectAll(elements) {
         e1.intersectWith(e2)
       })
   })
-}
-
-function getColour() {
-  const col = colours[colour_i]
-  colour_i = (colour_i + 1) % colours.length
-  return col
-}
-
-function drawAllElements(svgElem, elements) {
-  //const svg_elem = document.getElementById('scratch-svg')
-  elements.forEach((e) => {
-    if (e instanceof WrappedBezier) {
-      e.split().forEach((v) => {
-        drawPath(v, getColour(), svgElem)
-      })
-    } else if (e instanceof WrappedLine) {
-      e.split().forEach((v) => {
-        drawLine(v, getColour(), svgElem)
-      })
-    }
-  })
-}
-
-function drawPath(d, stroke, svg_elem) {
-  const path_elem = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'path'
-  )
-  path_elem.setAttribute(
-    'd',
-    `M ${d[0].x},${d[0].y} C ${d[1].x},${d[1].y} ${d[2].x},${d[2].y} ${d[3].x},${d[3].y}`
-  )
-  path_elem.setAttribute('stroke', stroke)
-  path_elem.setAttribute('fill', 'none')
-  svg_elem.appendChild(path_elem)
-}
-
-function drawLine(vals, stroke, svg_elem) {
-  const path_elem = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'line'
-  )
-  path_elem.setAttribute('x1', vals.p1.x)
-  path_elem.setAttribute('y1', vals.p1.y)
-  path_elem.setAttribute('x2', vals.p2.x)
-  path_elem.setAttribute('y2', vals.p2.y)
-
-  path_elem.setAttribute('stroke', stroke)
-  path_elem.setAttribute('fill', 'none')
-  svg_elem.appendChild(path_elem)
 }
 
 /* ---------------------------------------------------- */
@@ -201,16 +136,19 @@ class WrappedLine extends Wrapper {
     // [0, t1], [t1,t2], [t2,t3], ... , [tn,1]
     this.intersections.sort()
 
-    let points = []
+    let lines = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
-      const new_point = {
+      let new_line = {
+        type: 'line',
+        n_segments: 1,
         p1: this.getPointFromT(this.intersections[i]),
         p2: this.getPointFromT(this.intersections[i + 1]),
       }
-      points.push(new_point)
+      new_line['length'] = vectorLength(lineToVector(new_line))
+      lines.push(new_line)
     }
 
-    return points
+    return lines
   }
 
   getNearestPointForPoint(point) {
@@ -262,11 +200,21 @@ class WrappedBezier extends Wrapper {
 
     let points = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
-      points.push(
-        this.bezier.split(this.intersections[i], this.intersections[i + 1])
-          .points
+      const new_bezier = this.bezier.split(
+        this.intersections[i],
+        this.intersections[i + 1]
       )
+
+      points.push({
+        type: 'cubic',
+        p1: new_bezier.points[0],
+        c1: new_bezier.points[1],
+        c2: new_bezier.points[2],
+        p2: new_bezier.points[3],
+        length: new_bezier.length(),
+      })
     }
+
     return points
   }
 
@@ -279,4 +227,4 @@ class WrappedBezier extends Wrapper {
   }
 }
 
-export default preprocess
+export { preprocess, WrappedLine, WrappedBezier }

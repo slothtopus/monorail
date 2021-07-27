@@ -1,12 +1,12 @@
 <template>
-  <MazeExample />
+  <MazePreprocessExample />
 </template>
 
 <script>
-import MazeExample from '@/components/MazeExample.vue'
+import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
 export default {
   name: 'App',
-  components: { MazeExample },
+  components: { MazePreprocessExample },
 }
 </script>
 

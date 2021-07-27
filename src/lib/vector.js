@@ -51,8 +51,8 @@ export function lineTFromPoint(line, pos) {
 
 export function lineNearestPointForPoint(line, point) {
   /*
-    Gets the nearest position on the line to point
-    */
+  Gets the nearest position on the line to point
+  */
   const pos = lineTFromPoint(line, point)
   if (pos.t < 0) {
     return linePointFromT(line, 0)
