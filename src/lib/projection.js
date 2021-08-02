@@ -195,7 +195,7 @@ class Projector {
   }
 
   moveRecursive(v, t_, element_index_) {
-    const moves = this.findMoves(v, t_, element_index_, 0, [])
+    const moves = this.findMoves(v, t_, t_, element_index_, 0, [])
     console.log('moveRecursive: moves: ', moves)
     const max_distance = Math.max(...moves.map((m) => m.total_distance))
     const best_move_i = moves.findIndex((m) => m.total_distance == max_distance)
@@ -210,11 +210,15 @@ class Projector {
     }
   }
 
-  findMoves(v, t_, element_index_, distance, journey) {
-    //debugger
+  findMoves(v, t_old, t_, element_index_, distance, journey) {
     journey = [
       ...journey,
-      { path_index: element_index_, t: t_, distance: distance },
+      {
+        element_index: element_index_,
+        t_start: t_old,
+        t_end: t_,
+        distance: distance,
+      },
     ]
 
     const epsilon = 0.000001
@@ -255,6 +259,7 @@ class Projector {
       } else {
         return this.findMoves(
           m.v_new,
+          m.t,
           m.t_new,
           m.i,
           distance + m.distance,
@@ -272,7 +277,6 @@ class Projector {
   }
 
   getPoint() {
-    debugger
     return getPointOnElement(this.elements[this.element_index], this.t)
   }
 

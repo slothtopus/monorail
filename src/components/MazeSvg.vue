@@ -323,7 +323,7 @@ path,
 line {
   stroke: white;
   fill: none;
-  stroke-width: 2;
+  stroke-width: 1;
   stroke-linecap: square;
 }
 </style>
@@ -334,11 +334,31 @@ line {
 }
 
 #movePoint:hover {
-  filter: brightness(2);
+  filter: brightness(1.4);
 }
 
 #movePoint.selected {
   filter: brightness(1.4);
   stroke: yellow;
+}
+
+#vectorPoint {
+  cursor: pointer;
+}
+
+#vectorPoint:hover {
+  filter: brightness(2);
+}
+
+#vectorPoint.selected {
+  filter: brightness(1.4);
+  stroke: yellow;
+}
+
+#projectedPath {
+  fill: none;
+  stroke: greenyellow;
+  stroke-width: 3;
+  stroke-linecap: square;
 }
 </style>
