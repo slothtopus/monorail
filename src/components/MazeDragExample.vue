@@ -16,8 +16,8 @@
 import MazeSvg from '@/components/MazeSvg.vue'
 import { preprocess } from '@/lib/preprocess.js'
 import { Projector, getPointOnElement } from '@/lib/projection.js'
-import { linePointFromT } from '@/lib/vector.js'
-import { Bezier } from 'bezier-js'
+//import { linePointFromT } from '@/lib/vector.js'
+//import { Bezier } from 'bezier-js'
 
 export default {
   name: 'MazeDragExample',
@@ -48,6 +48,7 @@ export default {
       let elements = await preprocess(this.$refs['reference-maze'].$el)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
+      //debugger
       elements.forEach((e) => this.projector.addElement(e))
 
       const point = this.projector.getPoint()
@@ -230,14 +231,14 @@ export default {
       }, new Map())
 
       const path_kv = [...paths]
+
       const path_str = path_kv
         .filter((x) => x[1][0] != x[1][1])
         .map((x, i) => {
-          return this.makePathString(
-            this.projector.elements[x[0]],
+          return this.projector.elements[x[0]].getPathString(
+            i == 0,
             x[1][0],
-            x[1][1],
-            i == 0
+            x[1][1]
           )
         })
         .join(' ')
@@ -245,7 +246,8 @@ export default {
       this.projectedPath.setAttribute('d', path_str)
     },
 
-    makePathString(elem, t_start, t_end, includeMoveTo) {
+    /*makePathString(elem, t_start, t_end, includeMoveTo) {
+      debugger
       let path_str = ''
 
       if (elem.type == 'cubic') {
@@ -296,7 +298,7 @@ export default {
       }
 
       return path_str
-    },
+    },*/
 
     bufferMoveTimed(moveVec) {
       const oldestMoveMs = 500

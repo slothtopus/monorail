@@ -5,8 +5,9 @@ import {
   vectorLength,
   traverseVector,
 } from '@/lib/vector.js'
+import { Line, CubicBezier } from '@/lib/elements.js'
 
-function reverseElement(el) {
+/*function reverseElement(el) {
   if (el.type == 'line') {
     return reverseLine(el)
   } else if (el.type == 'cubic') {
@@ -25,7 +26,7 @@ function reverseCubic(cubic) {
     c1: cubic.c2,
     c2: cubic.c1,
   })
-}
+}*/
 
 function cubicPointFromT(w, t) {
   const t2 = t * t
@@ -41,9 +42,14 @@ function cubicPointFromT(w, t) {
 }
 
 function getPointOnElement(el, t) {
-  if (el.type == 'line') {
+  /*if (el.type == 'line') {
     return linePointFromT(el, t)
   } else if (el.type == 'cubic') {
+    return cubicPointFromT(el, t)
+  }*/
+  if (el instanceof Line) {
+    return linePointFromT(el, t)
+  } else if (el instanceof CubicBezier) {
     return cubicPointFromT(el, t)
   }
 }
@@ -72,7 +78,8 @@ class Projector {
   addElement(el) {
     const el_index = this.elements.length
     this.addSegmentCount(el)
-    const el_rev = reverseElement(el)
+    //const el_rev = reverseElement(el)
+    const el_rev = el.reverse()
     const el_rev_index = this.elements.length + 1
 
     this.addConnections(el, el_index)

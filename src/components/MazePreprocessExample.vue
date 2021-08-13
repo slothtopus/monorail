@@ -24,6 +24,7 @@
 <script>
 import MazeSvg from '@/components/MazeSvg.vue'
 import { preprocess } from '@/lib/preprocess.js'
+import { Line, CubicBezier } from '@/lib/elements.js'
 
 export default {
   name: 'MazePreprocessExample',
@@ -57,6 +58,7 @@ export default {
       let elements = await preprocess(this.$refs['reference-maze'].$el)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
+      debugger
       this.drawAllElements(elements)
     }, 0)
   },
@@ -68,8 +70,10 @@ export default {
     },
     drawAllElements(elements) {
       elements.forEach((e) => {
-        if (e.type == 'line') this.drawLine(e, this.getColour())
-        if (e.type == 'cubic') this.drawPath(e, this.getColour())
+        //if (e.type == 'line') this.drawLine(e, this.getColour())
+        //if (e.type == 'cubic') this.drawPath(e, this.getColour())
+        if (e instanceof Line) this.drawLine(e, this.getColour())
+        if (e instanceof CubicBezier) this.drawPath(e, this.getColour())
       })
     },
     drawPath(d, stroke) {

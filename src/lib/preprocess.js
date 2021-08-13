@@ -4,11 +4,12 @@ import {
   vectorLength,
   subtractVector,
   intersectLines,
-  lineToVector,
+  //lineToVector,
   linePointFromT,
   lineTFromPoint,
   nearestPointOnLineForPoint,
 } from '@/lib/vector.js'
+import { CubicBezier, Line } from '@/lib/elements.js'
 
 async function preprocess(mainSvg) {
   let elements = wrapAllElements(mainSvg)
@@ -133,7 +134,7 @@ class WrappedLine extends Wrapper {
 
     let lines = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
-      let new_line = {
+      /*let new_line = {
         id: this.id + '_' + i,
         type: 'line',
         n_segments: 1,
@@ -141,6 +142,12 @@ class WrappedLine extends Wrapper {
         p2: this.getPointFromT(this.intersections[i + 1]),
       }
       new_line['length'] = vectorLength(lineToVector(new_line))
+      lines.push(new_line)*/
+      const new_line = new Line({
+        id: this.id + '_' + i,
+        p1: this.getPointFromT(this.intersections[i]),
+        p2: this.getPointFromT(this.intersections[i + 1]),
+      })
       lines.push(new_line)
     }
 
@@ -194,14 +201,24 @@ class WrappedBezier extends Wrapper {
     // [0, t1], [t1,t2], [t2,t3], ... , [tn,1]
     this.intersections.sort()
 
-    let points = []
+    let elements = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
       const new_bezier = this.bezier.split(
         this.intersections[i],
         this.intersections[i + 1]
       )
 
-      points.push({
+      const elem = new CubicBezier({
+        id: this.id + '_' + i,
+        p1: new_bezier.points[0],
+        c1: new_bezier.points[1],
+        c2: new_bezier.points[2],
+        p2: new_bezier.points[3],
+      })
+
+      elements.push(elem)
+
+      /*points.push({
         id: this.id + '_' + i,
         type: 'cubic',
         p1: new_bezier.points[0],
@@ -209,10 +226,10 @@ class WrappedBezier extends Wrapper {
         c2: new_bezier.points[2],
         p2: new_bezier.points[3],
         length: new_bezier.length(),
-      })
+      })*/
     }
 
-    return points
+    return elements
   }
 
   getNearestPointForPoint(point) {
