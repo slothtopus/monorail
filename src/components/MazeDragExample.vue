@@ -1,8 +1,5 @@
 <template>
   <div class="maze-box" style="">
-    <!--<div style="position: absolute; top: 0px; left: 0px; padding-left: 5rem">
-      <p @click="debug">DEBUG</p>
-    </div>-->
     <MazeSvg
       id="reference-maze"
       ref="reference-maze"
@@ -16,8 +13,6 @@
 import MazeSvg from '@/components/MazeSvg.vue'
 import { preprocess } from '@/lib/preprocess.js'
 import { Projector } from '@/lib/projection.js'
-//import { linePointFromT } from '@/lib/vector.js'
-//import { Bezier } from 'bezier-js'
 
 export default {
   name: 'MazeDragExample',
@@ -49,13 +44,9 @@ export default {
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
 
-      debugger
       elements.forEach((e) => this.projector.addElement(e))
       this.projector.setCurrentElement(this.projector.elements[0])
-
       const point = this.projector.getPoint()
-      const move = this.projector.getMove({ x: -100, y: -100 })
-      console.log(move)
       this.addControls(point.x, point.y)
       this.updateProjectedMove()
     }, 0)
@@ -139,23 +130,10 @@ export default {
       this.bufferMoveTimed(moveVector)
       const expMoveVector = this.getExponentialMoveVec()
 
-      /*const vals = this.projector.moveRecursive(
-        expMoveVector,
-        this.projector.t,
-        this.projector.element_index
-      )
-      console.log('moveRecursive returns: ', vals)*/
-
       const vals = this.projector.getMove(expMoveVector)
       console.log('getMove returns: ', vals)
       this.projector.moveTo(vals)
       const new_point = this.projector.getPoint()
-      /*this.projector.t = vals.t
-      this.projector.element_index = vals.i
-      const new_point = getPointOnElement(
-        this.projector.elements[this.projector.element_index],
-        this.projector.t
-      )*/
 
       this.updateMovePoint(new_point.x, new_point.y)
       this.updateProjectedMove()
@@ -186,9 +164,11 @@ export default {
       this.vectorLine.setAttribute('x1', x)
       this.vectorLine.setAttribute('y1', y)
     },
+
     clamp(x, min, max) {
       return Math.min(Math.max(x, min), max)
     },
+
     updateVectorPoint(x_delta, y_delta) {
       const x = this.clamp(
         +this.vectorPoint.getAttribute('cx') + x_delta,
@@ -216,103 +196,11 @@ export default {
           +this.movePoint.getAttribute('cy'),
       }
 
-      /*const vals = this.projector.moveRecursive(
-        projectVec,
-        this.projector.t,
-        this.projector.element_index
-      )*/
-
       const vals = this.projector.getMove(projectVec)
-
-      // TODO: factor out into projector
-      /*let paths = vals.journey.reduce((s, x) => {
-        let t_vals = s.get(x.element_index)
-        t_vals = t_vals === undefined ? [undefined, undefined] : t_vals
-
-        let last_key = Array.from(s.keys()).pop()
-        last_key = last_key === undefined ? -1 : last_key
-
-        if (x.element_index != last_key) {
-          t_vals = [x.t_start, x.t_end]
-        } else {
-          t_vals = [t_vals[0], x.t_end]
-        }
-
-        s.set(x.element_index, t_vals)
-        return s
-      }, new Map())
-
-      const path_kv = [...paths]
-
-      const path_str = path_kv
-        .filter((x) => x[1][0] != x[1][1])
-        .map((x, i) => {
-          return this.projector.elements[x[0]].getPathString(
-            i == 0,
-            x[1][0],
-            x[1][1]
-          )
-        })
-        .join(' ')*/
-
       const path_str = this.projector.journeyToPathString(vals.journey)
 
       this.projectedPath.setAttribute('d', path_str)
     },
-
-    /*makePathString(elem, t_start, t_end, includeMoveTo) {
-      debugger
-      let path_str = ''
-
-      if (elem.type == 'cubic') {
-        let b_vals, t_min, t_max
-        if (t_start < t_end) {
-          t_min = t_start
-          t_max = t_end
-          b_vals = [
-            elem.p1.x,
-            elem.p1.y,
-            elem.c1.x,
-            elem.c1.y,
-            elem.c2.x,
-            elem.c2.y,
-            elem.p2.x,
-            elem.p2.y,
-          ]
-        } else {
-          t_min = 1 - t_start
-          t_max = 1 - t_end
-          b_vals = [
-            elem.p2.x,
-            elem.p2.y,
-            elem.c2.x,
-            elem.c2.y,
-            elem.c1.x,
-            elem.c1.y,
-            elem.p1.x,
-            elem.p1.y,
-          ]
-        }
-        const b = new Bezier(b_vals).split(t_min, t_max)
-        console.log(b)
-        if (includeMoveTo) {
-          path_str += `M ${b.points[0].x},${b.points[0].y} `
-        }
-
-        path_str += `C ${b.points[1].x}, ${b.points[1].y} `
-        path_str += `${b.points[2].x}, ${b.points[2].y} `
-        path_str += `${b.points[3].x}, ${b.points[3].y}`
-      } else if (elem.type == 'line') {
-        if (includeMoveTo) {
-          const p1 = linePointFromT(elem, t_start)
-          path_str += `M ${p1.x},${p1.y} `
-        }
-        const p2 = linePointFromT(elem, t_end)
-        path_str += `L ${p2.x},${p2.y}`
-      }
-
-      return path_str
-    },*/
 
     bufferMoveTimed(moveVec) {
       const oldestMoveMs = 500

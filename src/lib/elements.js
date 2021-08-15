@@ -12,35 +12,9 @@ import {
 To add to element classes:
 
 TODO NEXT:
-Create add connections mixin for elements
-
-When objects added to projector:
-- setSegmentCount(n_segments)
-- addConnections(array of existing elements)
-    - We do this once for element and once for reversed element
-
-- getPrevConnections(): returns values from set of previous connections
-- getPostConnections(): ""
-- addPrevConnection(obj)
-- addPostConnection(obj)
-
-
-
-- add connections logic
-    - projector stores element objects and connections are object reference instead of array indices
-methods:
-setSegmentCount
-getNearestPointForPoint
-getTfromPoint
-getPointFromT (replaces getPointOnElement method used in Projector)
-lineFromTbounds? (or leave this in projector?)
-
-
-preprocess creates WrappedCubicBezier and WrappedLine subclasses, which add intersecting and splitting
+Add WrappedCubicBezier and WrappedLine subclasses in preprocess, which add intersecting and splitting
 methods.
-
-
-
+Common intersection stuff added to both of these with a mixin
 */
 
 const connectionsMixin = {

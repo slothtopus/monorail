@@ -4,7 +4,6 @@ import {
   vectorLength,
   subtractVector,
   intersectLines,
-  //lineToVector,
   linePointFromT,
   lineTFromPoint,
   nearestPointOnLineForPoint,
@@ -134,15 +133,6 @@ class WrappedLine extends Wrapper {
 
     let lines = []
     for (let i = 0; i < this.intersections.length - 1; i++) {
-      /*let new_line = {
-        id: this.id + '_' + i,
-        type: 'line',
-        n_segments: 1,
-        p1: this.getPointFromT(this.intersections[i]),
-        p2: this.getPointFromT(this.intersections[i + 1]),
-      }
-      new_line['length'] = vectorLength(lineToVector(new_line))
-      lines.push(new_line)*/
       const new_line = new Line({
         id: this.id + '_' + i,
         p1: this.getPointFromT(this.intersections[i]),
@@ -217,16 +207,6 @@ class WrappedBezier extends Wrapper {
       })
 
       elements.push(elem)
-
-      /*points.push({
-        id: this.id + '_' + i,
-        type: 'cubic',
-        p1: new_bezier.points[0],
-        c1: new_bezier.points[1],
-        c2: new_bezier.points[2],
-        p2: new_bezier.points[3],
-        length: new_bezier.length(),
-      })*/
     }
 
     return elements
