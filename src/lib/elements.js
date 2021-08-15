@@ -1,8 +1,30 @@
 import { Bezier } from 'bezier-js'
-import { vectorLength, lineToVector, linePointFromT } from '@/lib/vector.js'
+import {
+  vectorLength,
+  lineToVector,
+  linePointFromT,
+  lineTFromPoint,
+  nearestPointOnLineForPoint,
+  subtractVector,
+} from '@/lib/vector.js'
 
 /*
 To add to element classes:
+
+TODO NEXT:
+Create add connections mixin for elements
+
+When objects added to projector:
+- setSegmentCount(n_segments)
+- addConnections(array of existing elements)
+    - We do this once for element and once for reversed element
+
+- getPrevConnections(): returns values from set of previous connections
+- getPostConnections(): ""
+- addPrevConnection(obj)
+- addPostConnection(obj)
+
+
 
 - add connections logic
     - projector stores element objects and connections are object reference instead of array indices
@@ -11,6 +33,7 @@ setSegmentCount
 getNearestPointForPoint
 getTfromPoint
 getPointFromT (replaces getPointOnElement method used in Projector)
+lineFromTbounds? (or leave this in projector?)
 
 
 preprocess creates WrappedCubicBezier and WrappedLine subclasses, which add intersecting and splitting
@@ -19,13 +42,62 @@ methods.
 
 
 */
-class Line {
+
+const connectionsMixin = {
+  dist_epsilon: 1,
+
+  addConnections(elems) {
+    elems.forEach((el2) => {
+      if (vectorLength(subtractVector(this.p1, el2.p2)) < this.dist_epsilon) {
+        this.addPrevConnection(el2)
+        el2.addPostConnection(this)
+      }
+
+      if (vectorLength(subtractVector(this.p2, el2.p1)) < this.dist_epsilon) {
+        this.addPostConnection(el2)
+        el2.addPrevConnection(this)
+      }
+    })
+  },
+
+  addPrevConnection(elem) {
+    if (this.prev_connections === undefined) {
+      this.prev_connections = new Set()
+    }
+    this.prev_connections.add(elem)
+  },
+
+  addPostConnection(elem) {
+    if (this.post_connections === undefined) {
+      this.post_connections = new Set()
+    }
+    this.post_connections.add(elem)
+  },
+
+  getPrevConnections() {
+    return [...(this.prev_connections?.values() ?? [])]
+  },
+
+  getPostConnections() {
+    return [...(this.post_connections?.values() ?? [])]
+  },
+}
+
+class Element {
+  setSegmentCount(n_segments) {
+    this.n_segments = n_segments
+  }
+}
+
+class Line extends Element {
+  n_segments = 1
+
   constructor(config) {
+    super()
     this.id = config['id']
     this.p1 = config['p1']
     this.p2 = config['p2']
     this.length = vectorLength(lineToVector({ p1: this.p1, p2: this.p2 }))
-    this.setSegmentCount()
   }
 
   reverse() {
@@ -50,13 +122,22 @@ class Line {
     return path_str
   }
 
-  setSegmentCount() {
-    this.n_segments = 1
+  getTfromPoint(point) {
+    return lineTFromPoint(this, point)
+  }
+
+  getPointFromT(t) {
+    return linePointFromT(this, t)
+  }
+
+  getNearestPointForPoint(point) {
+    return nearestPointOnLineForPoint(this, point)
   }
 }
 
-class CubicBezier {
+class CubicBezier extends Element {
   constructor(config) {
+    super()
     this.id = config['id']
     this.p1 = config['p1']
     this.c1 = config['c1']
@@ -110,6 +191,21 @@ class CubicBezier {
 
     return path_str
   }
+
+  getNearestPointForPoint(point) {
+    return this.bezier.project(point)
+  }
+
+  getPointFromT(t) {
+    return this.bezier.get(t)
+  }
+
+  getTfromPoint(point) {
+    return this.getNearestPointForPoint(point)
+  }
 }
+
+Object.assign(Line.prototype, connectionsMixin)
+Object.assign(CubicBezier.prototype, connectionsMixin)
 
 export { Line, CubicBezier }

@@ -15,7 +15,7 @@
 <script>
 import MazeSvg from '@/components/MazeSvg.vue'
 import { preprocess } from '@/lib/preprocess.js'
-import { Projector, getPointOnElement } from '@/lib/projection.js'
+import { Projector } from '@/lib/projection.js'
 //import { linePointFromT } from '@/lib/vector.js'
 //import { Bezier } from 'bezier-js'
 
@@ -48,10 +48,14 @@ export default {
       let elements = await preprocess(this.$refs['reference-maze'].$el)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
-      //debugger
+
+      debugger
       elements.forEach((e) => this.projector.addElement(e))
+      this.projector.setCurrentElement(this.projector.elements[0])
 
       const point = this.projector.getPoint()
+      const move = this.projector.getMove({ x: -100, y: -100 })
+      console.log(move)
       this.addControls(point.x, point.y)
       this.updateProjectedMove()
     }, 0)
@@ -135,19 +139,24 @@ export default {
       this.bufferMoveTimed(moveVector)
       const expMoveVector = this.getExponentialMoveVec()
 
-      const vals = this.projector.moveRecursive(
+      /*const vals = this.projector.moveRecursive(
         expMoveVector,
         this.projector.t,
         this.projector.element_index
       )
-      console.log('moveRecursive returns: ', vals)
+      console.log('moveRecursive returns: ', vals)*/
 
-      this.projector.t = vals.t
+      const vals = this.projector.getMove(expMoveVector)
+      console.log('getMove returns: ', vals)
+      this.projector.moveTo(vals)
+      const new_point = this.projector.getPoint()
+      /*this.projector.t = vals.t
       this.projector.element_index = vals.i
       const new_point = getPointOnElement(
         this.projector.elements[this.projector.element_index],
         this.projector.t
-      )
+      )*/
+
       this.updateMovePoint(new_point.x, new_point.y)
       this.updateProjectedMove()
 
@@ -207,13 +216,16 @@ export default {
           +this.movePoint.getAttribute('cy'),
       }
 
-      const vals = this.projector.moveRecursive(
+      /*const vals = this.projector.moveRecursive(
         projectVec,
         this.projector.t,
         this.projector.element_index
-      )
+      )*/
 
-      let paths = vals.journey.reduce((s, x) => {
+      const vals = this.projector.getMove(projectVec)
+
+      // TODO: factor out into projector
+      /*let paths = vals.journey.reduce((s, x) => {
         let t_vals = s.get(x.element_index)
         t_vals = t_vals === undefined ? [undefined, undefined] : t_vals
 
@@ -241,7 +253,9 @@ export default {
             x[1][1]
           )
         })
-        .join(' ')
+        .join(' ')*/
+
+      const path_str = this.projector.journeyToPathString(vals.journey)
 
       this.projectedPath.setAttribute('d', path_str)
     },
