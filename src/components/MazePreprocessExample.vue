@@ -58,7 +58,6 @@ export default {
       let elements = await preprocess(this.$refs['reference-maze'].$el)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
-      debugger
       this.drawAllElements(elements)
     }, 0)
   },
