@@ -20,7 +20,6 @@ class Projector {
 
   elements = []
   t = 0
-  element_index = 2
   current_element = undefined
 
   addElement(el) {
@@ -124,7 +123,6 @@ class Projector {
 
   getMove(v, t = this.t, current_element = this.current_element) {
     const moves = this.findMoves(v, t, t, current_element, 0, [])
-    console.log('getMove: moves: ', moves)
     const max_distance = Math.max(...moves.map((m) => m.total_distance))
     const best_move_i = moves.findIndex((m) => m.total_distance == max_distance)
     if (best_move_i == -1) {
@@ -183,7 +181,16 @@ class Projector {
             t: m.t_new,
             element: m.element,
             total_distance: distance,
-            journey: journey,
+            // add final position to journey
+            journey: [
+              ...journey,
+              {
+                element: m.element,
+                t_start: m.t_new,
+                t_end: m.t_new,
+                distance: distance,
+              },
+            ],
           },
         ]
       } else {
@@ -233,12 +240,39 @@ class Projector {
   }
 
   moveTo(move) {
+    //console.log('moveTo:', move)
     this.t = move.t
     this.current_element = move.element
+    this.triggerEnterExitCallbacks(move.journey)
+    this.triggerMoveCallback(move)
   }
 
-  getPoint() {
-    return this.current_element.getPointFromT(this.t)
+  triggerEnterExitCallbacks(journey) {
+    for (let i = 1; i < journey.length; i++) {
+      if (!(journey[i - 1].element === journey[i].element)) {
+        journey[i - 1].element.exit && journey[i - 1].element.exit()
+        journey[i].element.enter && journey[i].element.enter()
+      }
+    }
+  }
+
+  triggerMoveCallback(move) {
+    move.element.move && move.element.move({ t: move.t })
+  }
+
+  getPoint(includeHidden = false) {
+    if (
+      (this.current_element.hiddenX || this.current_element.hiddenY) &&
+      !includeHidden
+    ) {
+      const tzeroPoint = this.current_element.getPointFromT(0)
+      let actualPoint = this.current_element.getPointFromT(this.t)
+      if (this.current_element.hiddenX) actualPoint.x = tzeroPoint.x
+      if (this.current_element.hiddenY) actualPoint.y = tzeroPoint.y
+      return actualPoint
+    } else {
+      return this.current_element.getPointFromT(this.t)
+    }
   }
 
   segmentBoundsForS(s, n_segments) {

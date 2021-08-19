@@ -72,6 +72,11 @@ class Line extends Element {
     this.p1 = config['p1']
     this.p2 = config['p2']
     this.length = vectorLength(lineToVector({ p1: this.p1, p2: this.p2 }))
+    this.enter = config.enter
+    this.exit = config.exit
+    this.move = config.move
+    this.hiddenX = config.hiddenX ?? false
+    this.hiddenY = config.hiddenY ?? false
   }
 
   reverse() {
@@ -129,6 +134,11 @@ class CubicBezier extends Element {
     )
     this.length = this.bezier.length()
     this.n_segments = config.n_segments || 10
+    this.enter = config.enter
+    this.exit = config.exit
+    this.move = config.move
+    this.hiddenX = config.hiddenX ?? false
+    this.hiddenY = config.hiddenY ?? false
   }
 
   // returns a new CubicBezier with the reversal of this curve

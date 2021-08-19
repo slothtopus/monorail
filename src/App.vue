@@ -3,6 +3,7 @@
     <div class="nav-box">
       <router-link to="/preprocess">Maze preprocessing</router-link>
       <router-link to="/drag">Maze dragging</router-link>
+      <router-link to="/hidden">Hidden paths</router-link>
     </div>
     <div class="content-box">
       <router-view />

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
 import MazeDragExample from '@/components/MazeDragExample.vue'
+import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
 
 const routes = [
   {
@@ -11,8 +12,13 @@ const routes = [
   },
   {
     path: '/drag',
-    name: MazeDragExample,
+    name: 'MazeDragExample',
     component: MazeDragExample,
+  },
+  {
+    path: '/hidden',
+    name: 'HiddenPathsExample',
+    component: HiddenPathsExample,
   },
   /*{
     path: '/',
