@@ -7,7 +7,11 @@
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       ref="svg-main"
-    ></svg>
+    >
+      <rect x="620" y="100" height="68" width="360" fill="grey" />
+      <rect x="620" y="230" height="68" width="360" fill="grey" />
+    </svg>
+
     <svg
       width="100%"
       height="50%"
@@ -17,7 +21,7 @@
       ref="svg-guide"
     >
       <path
-        d="M 50,200 L 500,200 L 500,400 L 950,400"
+        d="M 50,200 L 500,200 L 500,400 L 860,400"
         stroke="white"
         stroke-width="3"
         stroke-dasharray="10"
@@ -88,6 +92,7 @@ export default {
         },
         move: (vals) => {
           this.controlCircleElem.setAttribute('r', 120 - 90 * vals.t)
+          this.controlCircleElem.setAttribute('cx', 500 + 90 * vals.t)
           console.log(vals.t)
         },
         hiddenX: true,
@@ -96,10 +101,11 @@ export default {
 
       const l3 = new Line({
         id: 'line3',
-        p1: { x: 500, y: 200 },
+        p1: { x: 590, y: 200 },
         p2: { x: 950, y: 200 },
         enter: () => {
           console.log('Main projector: Enter line 3')
+          this.controlCircleElem.setAttribute('r', 30)
         },
         exit: () => {
           console.log('Main projector: Exit line 3')
@@ -144,7 +150,7 @@ export default {
       const l3 = new Line({
         id: 'line3',
         p1: { x: 500, y: 400 },
-        p2: { x: 950, y: 400 },
+        p2: { x: 860, y: 400 },
         enter: () => {
           console.log('Guide projector: Enter line 3')
         },
@@ -234,8 +240,13 @@ export default {
 
       const mainVals = this.mainProjector.getMove(moveVector)
       this.mainProjector.moveTo(mainVals)
-      const controlPoint = this.mainProjector.getPoint(false)
-      this.moveControlCircle(controlPoint)
+      if (
+        !this.mainProjector.current_element.hiddenX ||
+        !this.mainProjector.current_element.hiddenY
+      ) {
+        const controlPoint = this.mainProjector.getPoint(false)
+        this.moveControlCircle(controlPoint)
+      }
 
       this.mouse_x = event.clientX
       this.mouse_y = event.clientY
