@@ -1,4 +1,9 @@
-import { lineToVector, traverseVector } from '@/lib/vector.js'
+import {
+  lineToVector,
+  traverseVector,
+  subtractVector,
+  vectorLength,
+} from '@/lib/vector.js'
 import { CubicBezier } from '@/lib/elements.js'
 
 function rescale(t_, current_bounds, new_bounds) {
@@ -22,13 +27,15 @@ class Projector {
   t = 0
   current_element = undefined
 
-  addElement(el) {
+  addElement(el, reverse = true) {
     this.setElementSegmentCount(el)
-    const el_rev = el.reverse()
     el.addConnections(this.elements)
-    el_rev.addConnections(this.elements)
     this.elements.push(el)
-    this.elements.push(el_rev)
+    if (reverse) {
+      const el_rev = el.reverse()
+      el_rev.addConnections(this.elements)
+      this.elements.push(el_rev)
+    }
   }
 
   setElementSegmentCount(el) {
@@ -284,6 +291,26 @@ class Projector {
     const p1 = el.getPointFromT(t_bounds[0])
     const p2 = el.getPointFromT(t_bounds[1])
     return { p1: p1, p2: p2 }
+  }
+
+  projectPoint(point) {
+    const projected = this.elements.map((e) => {
+      const nearest = e.getNearestPointForPoint(point)
+      const sub = subtractVector(nearest, point)
+      const dist = vectorLength(sub)
+      return {
+        element: e,
+        x: nearest.x,
+        y: nearest.y,
+        t: nearest.t,
+        dist: dist,
+      }
+    })
+
+    const minIndex = projected.findIndex(
+      (x) => x.dist == Math.min(...projected.map((p) => p.dist))
+    )
+    return projected[minIndex]
   }
 }
 

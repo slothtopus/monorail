@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
 import MazeDragExample from '@/components/MazeDragExample.vue'
 import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
+import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/hidden',
     name: 'HiddenPathsExample',
     component: HiddenPathsExample,
+  },
+  {
+    path: '/disc',
+    name: 'SpinningDiscExample',
+    component: SpinningDiscExample,
   },
   /*{
     path: '/',

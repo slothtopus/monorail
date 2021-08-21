@@ -27,11 +27,6 @@
         stroke-dasharray="10"
         fill="none"
       />
-      <!--<path
-        d="M 0,0 L 1000,0 L 1000,500 L 0,500 L 0,0"
-        stroke="white"
-        fill="none"
-      />-->
     </svg>
   </div>
 </template>
@@ -63,8 +58,6 @@ export default {
     this.moveGuideCircle(guidePoint)
     const controlPoint = this.mainProjector.getPoint(false)
     this.moveControlCircle(controlPoint)
-
-    //debugger
   },
   methods: {
     setupMainProjector() {
