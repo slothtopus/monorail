@@ -1,5 +1,10 @@
 <template>
-  <svg viewBox="-6 -6 255 255" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    id="maze-svg"
+    viewBox="-6 -6 255 255"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
       id="path_1"
       d="M 106.02943725152286,139.97056274847714 A 24,24 0 1,1 123,147"
@@ -329,33 +334,33 @@ line {
 </style>
 
 <style>
-#movePoint {
+#maze-svg #movePoint {
   cursor: pointer;
 }
 
-#movePoint:hover {
+#maze-svg #movePoint:hover {
   filter: brightness(1.4);
 }
 
-#movePoint.selected {
+#maze-svg #movePoint.selected {
   filter: brightness(1.4);
   stroke: yellow;
 }
 
-#vectorPoint {
+#maze-svg #vectorPoint {
   cursor: pointer;
 }
 
-#vectorPoint:hover {
+#maze-svg #vectorPoint:hover {
   filter: brightness(2);
 }
 
-#vectorPoint.selected {
+#maze-svg #vectorPoint.selected {
   filter: brightness(1.4);
   stroke: yellow;
 }
 
-#projectedPath {
+#maze-svg #projectedPath {
   fill: none;
   stroke: greenyellow;
   stroke-width: 3;

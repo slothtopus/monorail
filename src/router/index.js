@@ -4,6 +4,7 @@ import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
 import MazeDragExample from '@/components/MazeDragExample.vue'
 import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
 import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
+import BezierDragExample from '../components/BezierDragExample.vue'
 
 const routes = [
   {
@@ -26,20 +27,11 @@ const routes = [
     name: 'SpinningDiscExample',
     component: SpinningDiscExample,
   },
-  /*{
-    path: '/',
-    name: 'Home',
-    component: Home,
-  },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => */
-  //import(/* webpackChunkName: "about" */ '../views/About.vue'),
-  //},
+    path: '/bezier',
+    name: 'BezierDragExample',
+    component: BezierDragExample,
+  },
 ]
 
 const router = createRouter({

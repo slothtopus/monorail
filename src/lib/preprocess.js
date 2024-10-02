@@ -2,20 +2,21 @@ import Snap from '@creately/snapsvg'
 import { vectorLength, subtractVector, intersectLines } from '@/lib/vector.js'
 import { CubicBezier, Line } from '@/lib/elements.js'
 
-async function preprocess(mainSvg) {
-  let elements = wrapAllElements(mainSvg)
+async function preprocess(mainSvg, skipLast = true) {
+  let elements = wrapAllElements(mainSvg, skipLast)
   intersectAll(elements)
   return elements.flatMap((e) => e.split())
 }
 
-function wrapAllElements(mainSvg) {
+function wrapAllElements(mainSvg, skipLast = true) {
   let elements = [...mainSvg.getElementsByTagName('path')].flatMap((e) => {
     // https://stackoverflow.com/questions/30277646/svg-convert-arcs-to-cubic-bezier
     const b = Snap.path.toCubic(Snap(e))
     let beziers = []
     // In the @creately/snapsvg version, the last element of Snap.path.toCubic is an odd
     // vertical straight line, so we do length - 1 to get rid of this
-    for (let i = 1; i < b.length - 1; i++) {
+    // skipLast = false to disable this behaviour
+    for (let i = 1; i < b.length - (skipLast ? 1 : 0); i++) {
       const wb = new WrappedCubicBezier({
         id: `${e.id}_B${i - 1}`,
         p1: { x: b[i - 1].slice(-2)[0], y: b[i - 1].slice(-2)[1] },

@@ -1,6 +1,7 @@
 <template>
   <div class="fullscreen">
     <div class="nav-box">
+      <router-link to="/bezier">Bezier dragging</router-link>
       <router-link to="/preprocess">Maze preprocessing</router-link>
       <router-link to="/drag">Maze dragging</router-link>
       <router-link to="/hidden">Hidden paths</router-link>

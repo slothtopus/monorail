@@ -1,22 +1,32 @@
 <template>
-  <div class="maze-box" style="">
-    <MazeSvg
-      id="reference-maze"
-      ref="reference-maze"
-      width="100%"
-      height="100%"
-    />
+  <div class="wrapper">
+    <div class="bezier-box" style="">
+      <BezierPathSvg
+        id="reference-bezier"
+        ref="reference-bezier"
+        width="100%"
+        height="100%"
+      />
+    </div>
+  </div>
+  <div class="instructions">
+    <p>Click the circles to drag the point along the path.</p>
+    <p>
+      The green line shows the red vector projected along the curve. A similar
+      projection technique is used to determine the movement of the grey point
+      along the line when dragged with the mouse.
+    </p>
   </div>
 </template>
 
 <script>
-import MazeSvg from '@/components/MazeSvg.vue'
 import { preprocess } from '@/lib/preprocess.js'
 import { Projector } from '@/lib/projection.js'
+import BezierPathSvg from './BezierPathSvg.vue'
 
 export default {
-  name: 'MazeDragExample',
-  components: { MazeSvg },
+  name: 'BezierDragExample',
+  components: { BezierPathSvg },
   data() {
     return {
       preprocessing: true,
@@ -25,7 +35,6 @@ export default {
       vectorPoint: undefined,
       vectorLine: undefined,
       projectedPath: undefined,
-      scaleFactor: undefined,
       mouse_x: undefined,
       mouse_y: undefined,
       moveBuffer: [],
@@ -35,18 +44,16 @@ export default {
   mounted() {
     this.preprocessing = true
 
-    this.onResize()
-    window.addEventListener('resize', this.onResize)
-
     setTimeout(async () => {
       console.log('starting to process')
-      let elements = await preprocess(this.$refs['reference-maze'].$el)
+      let elements = await preprocess(this.$refs['reference-bezier'].$el, true)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
 
       elements.forEach((e) => this.projector.addElement(e))
       this.projector.setCurrentElement(this.projector.elements[0])
       const point = this.projector.getPoint()
+      console.log(point)
       this.addControls(point.x, point.y)
       this.updateProjectedMove()
     }, 0)
@@ -56,7 +63,7 @@ export default {
       this.debugFlag = true
     },
     addControls(x, y) {
-      const svgElem = this.$refs['reference-maze'].$el
+      const svgElem = this.$refs['reference-bezier'].$el
 
       elem = document.createElementNS('http://www.w3.org/2000/svg', 'path')
       elem.id = 'projectedPath'
@@ -66,8 +73,8 @@ export default {
       let elem = document.createElementNS('http://www.w3.org/2000/svg', 'line')
       elem.setAttribute('x1', x)
       elem.setAttribute('y1', y)
-      elem.setAttribute('x2', x + 50)
-      elem.setAttribute('y2', y - 50)
+      elem.setAttribute('x2', x + 10)
+      elem.setAttribute('y2', y - 10)
       elem.setAttribute('stroke', 'red')
       elem.id = 'vectorLine'
       svgElem.appendChild(elem)
@@ -76,16 +83,16 @@ export default {
       elem = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
       elem.setAttribute('cx', x)
       elem.setAttribute('cy', y)
-      elem.setAttribute('r', 3.5)
+      elem.setAttribute('r', 0.75)
       elem.setAttribute('fill', 'grey')
       elem.id = 'movePoint'
       svgElem.appendChild(elem)
       this.movePoint = elem
 
       elem = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      elem.setAttribute('cx', x + 50)
-      elem.setAttribute('cy', y - 50)
-      elem.setAttribute('r', 3.5)
+      elem.setAttribute('cx', x + 10)
+      elem.setAttribute('cy', y - 10)
+      elem.setAttribute('r', 0.75)
       elem.setAttribute('fill', 'red')
       elem.id = 'vectorPoint'
       svgElem.appendChild(elem)
@@ -120,10 +127,7 @@ export default {
     },
 
     movePointMousemove(event) {
-      const moveVector = {
-        x: (event.clientX - this.mouse_x) * this.scaleFactor,
-        y: (event.clientY - this.mouse_y) * this.scaleFactor,
-      }
+      const moveVector = this.getMoveVector(event)
 
       if (moveVector.x == 0 && moveVector.y == 0) return
 
@@ -131,31 +135,21 @@ export default {
       const expMoveVector = this.getExponentialMoveVec()
 
       const vals = this.projector.getMove(expMoveVector)
-      console.log('getMove returns: ', vals)
       this.projector.moveTo(vals)
       const new_point = this.projector.getPoint()
 
       this.updateMovePoint(new_point.x, new_point.y)
       this.updateProjectedMove()
-
-      this.mouse_x = event.clientX
-      this.mouse_y = event.clientY
     },
 
     vectorPointMousemove(event) {
-      const moveVector = {
-        x: (event.clientX - this.mouse_x) * this.scaleFactor,
-        y: (event.clientY - this.mouse_y) * this.scaleFactor,
-      }
+      const moveVector = this.getMoveVector(event)
 
       if (moveVector.x == 0 && moveVector.y == 0) return
 
       this.updateVectorPoint(moveVector.x, moveVector.y)
 
       this.updateProjectedMove()
-
-      this.mouse_x = event.clientX
-      this.mouse_y = event.clientY
     },
 
     updateMovePoint(x, y) {
@@ -172,13 +166,13 @@ export default {
     updateVectorPoint(x_delta, y_delta) {
       const x = this.clamp(
         +this.vectorPoint.getAttribute('cx') + x_delta,
-        -6,
-        255
+        0,
+        79.375
       )
       const y = this.clamp(
         +this.vectorPoint.getAttribute('cy') + y_delta,
         0,
-        245
+        26.458
       )
       this.vectorPoint.setAttribute('cx', x)
       this.vectorPoint.setAttribute('cy', y)
@@ -221,19 +215,56 @@ export default {
       }, moveBuffer.shift())
     },
 
-    onResize() {
-      const svgRect = document
-        .getElementById('reference-maze')
-        .getBoundingClientRect()
-      this.scaleFactor = 261 / Math.min(svgRect.width, svgRect.height)
-      console.log('new scaleFactor:', this.scaleFactor)
+    getMoveVector(event) {
+      const svgElement = this.$refs['reference-bezier'].$el
+
+      const { x: clientX, y: clientY } = this.convertScreenCoordsToSVG(
+        svgElement,
+        event.clientX,
+        event.clientY
+      )
+      const { x: mouse_x, y: mouse_y } = this.convertScreenCoordsToSVG(
+        svgElement,
+        this.mouse_x,
+        this.mouse_y
+      )
+
+      const moveVector = {
+        x: clientX - mouse_x,
+        y: clientY - mouse_y,
+      }
+
+      this.mouse_x = event.clientX
+      this.mouse_y = event.clientY
+
+      return moveVector
+    },
+    convertScreenCoordsToSVG(svgElement, x, y) {
+      // Get the transformation matrix for the SVG element
+      var svgPoint = svgElement.createSVGPoint()
+
+      // Set the point to the screen coordinates
+      svgPoint.x = x
+      svgPoint.y = y
+
+      // Convert the point to SVG coordinates using the matrix
+      var svgCoords = svgPoint.matrixTransform(
+        svgElement.getScreenCTM().inverse()
+      )
+
+      return { x: svgCoords.x, y: svgCoords.y }
     },
   },
 }
 </script>
 
 <style scoped>
-.maze-box {
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.bezier-box {
   width: 100%;
   height: 100%;
   display: inline-flex;
@@ -243,39 +274,52 @@ export default {
   box-sizing: border-box;
   padding: 3rem;
 }
+
+.instructions {
+  padding: 1rem;
+  text-align: justify;
+  max-width: 35rem;
+  margin: 0 auto;
+}
 </style>
 
 <style>
-#reference-maze #movePoint {
+#reference-bezier #movePoint {
   cursor: pointer;
+  stroke-width: 0.15;
 }
 
-#reference-maze #movePoint:hover {
+#reference-bezier #movePoint:hover {
   filter: brightness(1.4);
 }
 
-#reference-maze #movePoint.selected {
+#reference-bezier #movePoint.selected {
   filter: brightness(1.4);
   stroke: yellow;
 }
 
-#reference-maze #vectorPoint {
+#reference-bezier #vectorPoint {
   cursor: pointer;
+  stroke-width: 0.15;
 }
 
-#reference-maze #vectorPoint:hover {
+#reference-bezier #vectorPoint:hover {
   filter: brightness(2);
 }
 
-#reference-maze #vectorPoint.selected {
+#reference-bezier #vectorLine {
+  stroke-width: 0.15;
+}
+
+#reference-bezier #vectorPoint.selected {
   filter: brightness(1.4);
   stroke: yellow;
 }
 
-#reference-maze #projectedPath {
+#reference-bezier #projectedPath {
   fill: none;
   stroke: greenyellow;
-  stroke-width: 3;
+  stroke-width: 0.5;
   stroke-linecap: square;
 }
 </style>
