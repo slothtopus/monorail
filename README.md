@@ -1,24 +1,9 @@
-# monorail-dev
+# Monorail
 
-## Project setup
-```
-npm install
-```
+All I wanted to do was drag something along a curve...
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+...but dragging a point along a path is trickier than it seems. Mouse movements, which are unconstrained by nature, need to be projected onto to the constraints of the path in a way that feels natural.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+I fell down the rabbit hole of this problem and the experiments here are my attempts at a general solution, plus a few interesting applications.
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+The experiments are written in Vue just to make life easier for myself, but most of the interesting code is [/src/lib](/src/lib). Run things locally with with `npm run serve` or [checkout the online demo here](https://github-demos.s3.eu-west-2.amazonaws.com/monorail/index.html).

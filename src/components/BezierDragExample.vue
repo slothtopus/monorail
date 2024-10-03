@@ -257,7 +257,6 @@ export default {
   align-items: center;
   position: relative;
   box-sizing: border-box;
-  padding: 3rem;
 }
 </style>
 
