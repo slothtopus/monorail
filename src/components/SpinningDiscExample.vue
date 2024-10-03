@@ -152,6 +152,12 @@ export default {
 
       return arcs.map((a) => translate(a, cx, cy))
     },
+    /*hideCursor() {
+      document.documentElement.style.cursor = 'none'
+    },
+    showCursor() {
+      document.documentElement.style.cursor = null
+    },*/
     mouseHandler(
       mouseClickHandler,
       mousemoveHandler,
@@ -163,7 +169,7 @@ export default {
 
       const el = event.target
       el.classList.add('selected')
-      document.body.style.cursor = 'pointer'
+      document.body.style.cursor = 'none'
 
       function mouseupHandler() {
         el.classList.remove('selected')
@@ -175,7 +181,7 @@ export default {
 
       mouseClickHandler(event)
       document.addEventListener('mousemove', mousemoveHandler)
-      document.addEventListener('mouseup', mouseupHandler)
+      document.addEventListener('mouseup', mouseupHandler.bind(this))
     },
     circleClick(discVals, event) {
       console.log('adding circle')
@@ -234,7 +240,7 @@ export default {
     },
     circleEnd(discVals) {
       console.log('removing circle')
-      discVals.guidePoint.remove()
+      discVals.guidePoint?.remove()
       discVals.guidePoint = undefined
       discVals.guidePath.forEach((p) => p.remove())
       discVals.guidePath = []
@@ -253,11 +259,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .spinning-disc-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
   height: 100%;
-  box-sizing: border-box;
-  padding: 3rem;
+  padding: 1rem;
+  overflow: hidden;
 }
 
 .disc-box {
@@ -270,7 +279,9 @@ export default {
   padding: 1em;
   box-sizing: border-box;
 }
+</style>
 
+<style>
 .guide-circle {
   stroke: red;
   stroke-dasharray: 5;

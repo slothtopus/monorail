@@ -6,7 +6,8 @@ import MazePreprocess from '@/views/MazePreprocess.vue'
 import MazeDrag from '@/views/MazeDrag.vue'
 //import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
 import HiddenPaths from '@/views/HiddenPaths.vue'
-import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
+import SpinningDisc from '@/views/SpinningDisc.vue'
+//import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
 import BezierDrag from '@/views/BezierDrag.vue'
 
 const routes = [
@@ -27,8 +28,8 @@ const routes = [
   },
   {
     path: '/disc',
-    name: 'SpinningDiscExample',
-    component: SpinningDiscExample,
+    name: 'SpinningDisc',
+    component: SpinningDisc,
   },
   {
     path: '/bezier',

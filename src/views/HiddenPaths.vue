@@ -6,7 +6,7 @@
       <p>
         This is a quick example to show how we can control other attributes by
         constraining a drag along a path. Our drag path is at the bottom. The
-        first and second line are translated into movement, but the middle line
+        first and third line are translated into movement, but the second line
         changes scale.
       </p>
     </template>
