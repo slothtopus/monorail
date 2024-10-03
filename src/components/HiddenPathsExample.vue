@@ -1,8 +1,6 @@
 <template>
   <div class="container">
     <svg
-      width="100%"
-      height="50%"
       viewBox="0 0 1000 500"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -13,8 +11,6 @@
     </svg>
 
     <svg
-      width="100%"
-      height="50%"
       viewBox="0 0 1000 500"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +184,7 @@ export default {
         )
         circleElem.setAttribute('r', 120)
         circleElem.setAttribute('stroke', 'none')
-        circleElem.setAttribute('fill', 'red')
+        circleElem.setAttribute('fill', 'darkgreen')
         circleElem.id = 'controlCircle'
         circleElem.addEventListener(
           'mousedown',
@@ -258,13 +254,9 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  /*display: inline-flex;*/
-  justify-content: center;
-  align-items: center;
+  display: flex;
   flex-direction: column;
-  position: relative;
-  box-sizing: border-box;
-  padding: 3rem;
+  overflow: hidden;
 }
 </style>
 
@@ -274,7 +266,7 @@ export default {
 }
 
 #controlCircle:hover {
-  filter: brightness(2);
+  filter: brightness(1.25);
 }
 
 #controlCircle.selected {

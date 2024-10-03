@@ -4,7 +4,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import MazePreprocess from '@/views/MazePreprocess.vue'
 //import MazeDragExample from '@/components/MazeDragExample.vue'
 import MazeDrag from '@/views/MazeDrag.vue'
-import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
+//import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
+import HiddenPaths from '@/views/HiddenPaths.vue'
 import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
 import BezierDrag from '@/views/BezierDrag.vue'
 
@@ -21,8 +22,8 @@ const routes = [
   },
   {
     path: '/hidden',
-    name: 'HiddenPathsExample',
-    component: HiddenPathsExample,
+    name: 'HiddenPaths',
+    component: HiddenPaths,
   },
   {
     path: '/disc',
