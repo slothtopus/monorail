@@ -1,21 +1,23 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
-import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
-import MazeDragExample from '@/components/MazeDragExample.vue'
+//import MazePreprocessExample from '@/components/MazePreprocessExample.vue'
+import MazePreprocess from '@/views/MazePreprocess.vue'
+//import MazeDragExample from '@/components/MazeDragExample.vue'
+import MazeDrag from '@/views/MazeDrag.vue'
 import HiddenPathsExample from '@/components/HiddenPathsExample.vue'
 import SpinningDiscExample from '@/components/SpinningDiscExample.vue'
-import BezierDragExample from '../components/BezierDragExample.vue'
+import BezierDrag from '@/views/BezierDrag.vue'
 
 const routes = [
   {
     path: '/preprocess',
-    name: 'MazePreprocessExample',
-    component: MazePreprocessExample,
+    name: 'MazePreprocess',
+    component: MazePreprocess,
   },
   {
     path: '/drag',
-    name: 'MazeDragExample',
-    component: MazeDragExample,
+    name: 'MazeDrag',
+    component: MazeDrag,
   },
   {
     path: '/hidden',
@@ -29,13 +31,13 @@ const routes = [
   },
   {
     path: '/bezier',
-    name: 'BezierDragExample',
-    component: BezierDragExample,
+    name: 'BezierDrag',
+    component: BezierDrag,
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
 })
 

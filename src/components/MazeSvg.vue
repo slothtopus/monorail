@@ -326,44 +326,7 @@ export default {
 <style scoped>
 path,
 line {
-  stroke: white;
   fill: none;
-  stroke-width: 1;
-  stroke-linecap: square;
-}
-</style>
-
-<style>
-#maze-svg #movePoint {
-  cursor: pointer;
-}
-
-#maze-svg #movePoint:hover {
-  filter: brightness(1.4);
-}
-
-#maze-svg #movePoint.selected {
-  filter: brightness(1.4);
-  stroke: yellow;
-}
-
-#maze-svg #vectorPoint {
-  cursor: pointer;
-}
-
-#maze-svg #vectorPoint:hover {
-  filter: brightness(2);
-}
-
-#maze-svg #vectorPoint.selected {
-  filter: brightness(1.4);
-  stroke: yellow;
-}
-
-#maze-svg #projectedPath {
-  fill: none;
-  stroke: greenyellow;
-  stroke-width: 3;
   stroke-linecap: square;
 }
 </style>

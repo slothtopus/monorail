@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="spinning-disc-container">
     <div class="disc-box">
       <CelticDiscSvg
         id="disc1"
@@ -254,7 +254,7 @@ export default {
 </script>
 
 <style>
-.container {
+.spinning-disc-container {
   height: 100%;
   box-sizing: border-box;
   padding: 3rem;

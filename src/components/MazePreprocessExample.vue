@@ -1,7 +1,12 @@
 <template>
   <div class="container">
     <div class="maze-box" style="">
-      <MazeSvg ref="reference-maze" width="100%" height="100%" />
+      <MazeSvg
+        id="original-maze"
+        ref="original-maze"
+        width="100%"
+        height="100%"
+      />
     </div>
     <div class="maze-box">
       <div class="loading-box" :class="{ hide: !preprocessing }">
@@ -52,16 +57,25 @@ export default {
   mounted() {
     this.preprocessing = true
     console.log('mounted')
+    this.colourOriginal()
 
     setTimeout(async () => {
       console.log('starting to process')
-      let elements = await preprocess(this.$refs['reference-maze'].$el)
+      let elements = await preprocess(this.$refs['original-maze'].$el)
       console.log('processed', elements.length, 'elements')
       this.preprocessing = false
       this.drawAllElements(elements)
     }, 0)
   },
   methods: {
+    colourOriginal() {
+      console.log('colourOriginal')
+      debugger
+      for (const childElem of this.$refs['original-maze'].$el.children) {
+        childElem.setAttribute('stroke', this.getColour())
+        console.log(childElem)
+      }
+    },
     getColour() {
       const col = this.colours[this.colour_i]
       this.colour_i = (this.colour_i + 1) % this.colours.length
@@ -110,17 +124,15 @@ export default {
 
 <style scoped>
 .container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
   height: 100%;
-  box-sizing: border-box;
-  padding: 3rem;
+  padding: 1rem;
 }
 
 .maze-box {
-  width: 50%;
   height: 100%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
 }
 
@@ -148,5 +160,9 @@ export default {
 
 .loading-box.hide {
   opacity: 0;
+}
+
+#original-maze {
+  stroke-width: 2;
 }
 </style>

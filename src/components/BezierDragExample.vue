@@ -1,21 +1,11 @@
 <template>
-  <div class="wrapper">
-    <div class="bezier-box" style="">
-      <BezierPathSvg
-        id="reference-bezier"
-        ref="reference-bezier"
-        width="100%"
-        height="100%"
-      />
-    </div>
-  </div>
-  <div class="instructions">
-    <p>Click the circles to drag the point along the path.</p>
-    <p>
-      The green line shows the red vector projected along the curve. A similar
-      projection technique is used to determine the movement of the grey point
-      along the line when dragged with the mouse.
-    </p>
+  <div class="bezier-box" style="">
+    <BezierPathSvg
+      id="reference-bezier"
+      ref="reference-bezier"
+      width="100%"
+      height="100%"
+    />
   </div>
 </template>
 
@@ -259,11 +249,6 @@ export default {
 </script>
 
 <style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
 .bezier-box {
   width: 100%;
   height: 100%;
@@ -273,13 +258,6 @@ export default {
   position: relative;
   box-sizing: border-box;
   padding: 3rem;
-}
-
-.instructions {
-  padding: 1rem;
-  text-align: justify;
-  max-width: 35rem;
-  margin: 0 auto;
 }
 </style>
 

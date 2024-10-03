@@ -1,11 +1,6 @@
 <template>
-  <div class="maze-box" style="">
-    <MazeSvg
-      id="reference-maze"
-      ref="reference-maze"
-      width="100%"
-      height="100%"
-    />
+  <div class="maze-box">
+    <MazeSvg id="reference-maze" ref="reference-maze" />
   </div>
 </template>
 
@@ -25,7 +20,6 @@ export default {
       vectorPoint: undefined,
       vectorLine: undefined,
       projectedPath: undefined,
-      scaleFactor: undefined,
       mouse_x: undefined,
       mouse_y: undefined,
       moveBuffer: [],
@@ -34,9 +28,6 @@ export default {
   },
   mounted() {
     this.preprocessing = true
-
-    this.onResize()
-    window.addEventListener('resize', this.onResize)
 
     setTimeout(async () => {
       console.log('starting to process')
@@ -68,7 +59,6 @@ export default {
       elem.setAttribute('y1', y)
       elem.setAttribute('x2', x + 50)
       elem.setAttribute('y2', y - 50)
-      elem.setAttribute('stroke', 'red')
       elem.id = 'vectorLine'
       svgElem.appendChild(elem)
       this.vectorLine = elem
@@ -77,7 +67,6 @@ export default {
       elem.setAttribute('cx', x)
       elem.setAttribute('cy', y)
       elem.setAttribute('r', 3.5)
-      elem.setAttribute('fill', 'grey')
       elem.id = 'movePoint'
       svgElem.appendChild(elem)
       this.movePoint = elem
@@ -86,7 +75,6 @@ export default {
       elem.setAttribute('cx', x + 50)
       elem.setAttribute('cy', y - 50)
       elem.setAttribute('r', 3.5)
-      elem.setAttribute('fill', 'red')
       elem.id = 'vectorPoint'
       svgElem.appendChild(elem)
       this.vectorPoint = elem
@@ -120,10 +108,7 @@ export default {
     },
 
     movePointMousemove(event) {
-      const moveVector = {
-        x: (event.clientX - this.mouse_x) * this.scaleFactor,
-        y: (event.clientY - this.mouse_y) * this.scaleFactor,
-      }
+      const moveVector = this.getMoveVector(event)
 
       if (moveVector.x == 0 && moveVector.y == 0) return
 
@@ -137,25 +122,16 @@ export default {
 
       this.updateMovePoint(new_point.x, new_point.y)
       this.updateProjectedMove()
-
-      this.mouse_x = event.clientX
-      this.mouse_y = event.clientY
     },
 
     vectorPointMousemove(event) {
-      const moveVector = {
-        x: (event.clientX - this.mouse_x) * this.scaleFactor,
-        y: (event.clientY - this.mouse_y) * this.scaleFactor,
-      }
+      const moveVector = this.getMoveVector(event)
 
       if (moveVector.x == 0 && moveVector.y == 0) return
 
       this.updateVectorPoint(moveVector.x, moveVector.y)
 
       this.updateProjectedMove()
-
-      this.mouse_x = event.clientX
-      this.mouse_y = event.clientY
     },
 
     updateMovePoint(x, y) {
@@ -221,12 +197,44 @@ export default {
       }, moveBuffer.shift())
     },
 
-    onResize() {
-      const svgRect = document
-        .getElementById('reference-maze')
-        .getBoundingClientRect()
-      this.scaleFactor = 261 / Math.min(svgRect.width, svgRect.height)
-      console.log('new scaleFactor:', this.scaleFactor)
+    getMoveVector(event) {
+      const svgElement = this.$refs['reference-maze'].$el
+
+      const { x: clientX, y: clientY } = this.convertScreenCoordsToSVG(
+        svgElement,
+        event.clientX,
+        event.clientY
+      )
+      const { x: mouse_x, y: mouse_y } = this.convertScreenCoordsToSVG(
+        svgElement,
+        this.mouse_x,
+        this.mouse_y
+      )
+
+      const moveVector = {
+        x: clientX - mouse_x,
+        y: clientY - mouse_y,
+      }
+
+      this.mouse_x = event.clientX
+      this.mouse_y = event.clientY
+
+      return moveVector
+    },
+    convertScreenCoordsToSVG(svgElement, x, y) {
+      // Get the transformation matrix for the SVG element
+      var svgPoint = svgElement.createSVGPoint()
+
+      // Set the point to the screen coordinates
+      svgPoint.x = x
+      svgPoint.y = y
+
+      // Convert the point to SVG coordinates using the matrix
+      var svgCoords = svgPoint.matrixTransform(
+        svgElement.getScreenCTM().inverse()
+      )
+
+      return { x: svgCoords.x, y: svgCoords.y }
     },
   },
 }
@@ -241,13 +249,24 @@ export default {
   align-items: center;
   position: relative;
   box-sizing: border-box;
-  padding: 3rem;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+#reference-maze {
+  height: 100%;
 }
 </style>
 
 <style>
+#reference-maze line,
+#reference-maze path {
+  stroke: white;
+}
+
 #reference-maze #movePoint {
   cursor: pointer;
+  fill: grey;
 }
 
 #reference-maze #movePoint:hover {
@@ -261,6 +280,11 @@ export default {
 
 #reference-maze #vectorPoint {
   cursor: pointer;
+  fill: red;
+}
+
+#reference-maze #vectorLine {
+  stroke: red;
 }
 
 #reference-maze #vectorPoint:hover {
